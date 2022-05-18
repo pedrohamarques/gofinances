@@ -1,4 +1,5 @@
 import React from 'react';
+import { StatusBar } from 'react-native';
 import 'intl';
 import 'intl/locale-data/jsonp/pt-BR';
 
@@ -36,6 +37,7 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
+        <StatusBar barStyle={"light-content"} />
         <AppRoutes />
       </NavigationContainer>
       </GestureHandlerRootView>
