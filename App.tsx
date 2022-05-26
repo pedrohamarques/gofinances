@@ -15,8 +15,12 @@ import {
 
 import theme from './src/global/styles/theme';
 
-import { NavigationContainer } from '@react-navigation/native';
+import { Routes } from './src/routes';
 import { AppRoutes } from './src/routes/app.routes';
+
+import { SignIn } from './src/screens/SignIn';
+
+import { AuthProvider, useAuth } from './src/hooks/auth';
 
 import { Register } from './src/screens/Register';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -29,17 +33,19 @@ export default function App() {
     Poppins_700Bold
   });
 
-  if (!fontsLoaded) {
+  const { userStorageLoading } = useAuth();
+
+  if (!fontsLoaded || userStorageLoading) {
     return <AppLoading />
   }
 
   return (
     <ThemeProvider theme={theme}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
         <StatusBar barStyle={"light-content"} />
-        <AppRoutes />
-      </NavigationContainer>
+        <AuthProvider>
+        <Routes />
+        </AuthProvider>
       </GestureHandlerRootView>
     </ThemeProvider>
   )
