@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator } from 'react-native';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage, { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from "styled-components";
@@ -50,6 +50,8 @@ export function Dashboard() {
 
     const theme = useTheme();
     const { signOut, user } = useAuth();
+    const {getItem, setItem} = useAsyncStorage(`@gofinances:transactions_user:${user.id}`);
+
 
     function getLastTransactionDate(
         collection: DataListProps[],
@@ -69,8 +71,7 @@ export function Dashboard() {
     }
 
     async function loadTransactions() {
-        const dataKey = `@gofinances:transactions_user:${user.id}`;
-        const response = await AsyncStorage.getItem(dataKey);
+        const response = await getItem();
         const transactions = response ? JSON.parse(response) : [];
 
         let entriesTotal = 0;
@@ -146,6 +147,17 @@ export function Dashboard() {
         setIsLoading(false);
     }
 
+    async function handleDelete(id: string) {
+        const response = await getItem();
+        const previousData = response ? JSON.parse(response) : [];
+
+        const data = previousData.filter((item: DataListProps) => item.id !== id);
+        setItem(JSON.stringify(data));
+        setTransactions(data);
+        loadTransactions();
+
+    }
+
     useEffect(() => {
         loadTransactions();
     }, [])
@@ -191,7 +203,7 @@ export function Dashboard() {
                         <TransactionList
                             data={transactions}
                             keyExtractor={item => item.id}
-                            renderItem={({ item }) => <TransactionCard data={item} />}
+                            renderItem={({ item }) => <TransactionCard data={item} handleDelete={() => handleDelete(item.id)} />}
                         />
 
                     </Transactions>
